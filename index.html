@@ -1,0 +1,1486 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>代谢健康问诊问卷 — 林超医生诊所</title>
+<style>
+:root {
+  --primary: #2563eb;
+  --primary-light: #dbeafe;
+  --primary-dark: #1e40af;
+  --accent: #f97316;
+  --danger: #dc2626;
+  --danger-light: #fef2f2;
+  --warning: #f59e0b;
+  --warning-light: #fffbeb;
+  --success: #16a34a;
+  --success-light: #f0fdf4;
+  --bg: #f8fafc;
+  --card-bg: #ffffff;
+  --text: #1e293b;
+  --text-light: #64748b;
+  --border: #e2e8f0;
+  --border-dark: #cbd5e1;
+  --radius: 12px;
+  --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-lg: 0 10px 25px rgba(0,0,0,0.1), 0 4px 6px rgba(0,0,0,0.05);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  font-size: 15px;
+}
+
+/* ===== Header ===== */
+.header {
+  background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 100%);
+  color: #fff;
+  padding: 20px 24px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+.header h1 { font-size: 20px; font-weight: 700; }
+.header .subtitle { font-size: 13px; opacity: 0.85; margin-top: 2px; }
+.header .progress-bar-wrap {
+  margin-top: 10px;
+  height: 6px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.header .progress-bar {
+  height: 100%;
+  background: #fff;
+  border-radius: 3px;
+  transition: width 0.3s ease;
+  width: 0%;
+}
+.header .progress-text { font-size: 12px; opacity: 0.8; margin-top: 4px; }
+
+/* ===== Layout ===== */
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px 16px 80px;
+}
+
+/* ===== Patient Info ===== */
+.patient-info-card {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  box-shadow: var(--shadow);
+  margin-bottom: 16px;
+  border-left: 4px solid var(--primary);
+}
+.patient-info-card h2 {
+  font-size: 16px;
+  margin-bottom: 12px;
+  color: var(--primary-dark);
+}
+.patient-info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+}
+.patient-info-grid .field { display: flex; flex-direction: column; gap: 4px; }
+.patient-info-grid label { font-size: 12px; color: var(--text-light); font-weight: 600; }
+.patient-info-grid input, .patient-info-grid select {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 14px;
+  transition: border 0.2s;
+}
+.patient-info-grid input:focus, .patient-info-grid select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-light);
+}
+
+/* ===== Dimension Section ===== */
+.dim-section {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+.dim-header {
+  padding: 14px 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  border-bottom: 1px solid var(--border);
+  transition: background 0.2s;
+  user-select: none;
+}
+.dim-header:hover { background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); }
+.dim-header .dim-title { font-size: 16px; font-weight: 700; color: var(--primary-dark); display: flex; align-items: center; gap: 8px; }
+.dim-header .dim-icon { font-size: 18px; }
+.dim-header .dim-meta { font-size: 12px; color: var(--text-light); display: flex; align-items: center; gap: 8px; }
+.dim-header .dim-toggle { font-size: 18px; transition: transform 0.3s; }
+.dim-section.collapsed .dim-toggle { transform: rotate(-90deg); }
+.dim-section.collapsed .dim-body { display: none; }
+.dim-body { padding: 16px 20px; }
+
+/* ===== Question ===== */
+.question { margin-bottom: 18px; padding-bottom: 14px; border-bottom: 1px solid var(--border); }
+.question:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+.question .q-label {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  display: flex;
+  gap: 6px;
+}
+.question .q-num {
+  color: var(--primary);
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.question .q-text { flex: 1; }
+.question .q-hint { font-size: 12px; color: var(--text-light); margin-top: 4px; }
+
+/* Options */
+.options { display: flex; flex-direction: column; gap: 6px; }
+.option {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s;
+  border: 1px solid transparent;
+}
+.option:hover { background: var(--primary-light); }
+.option.selected { background: var(--primary-light); border-color: var(--primary); }
+.option input[type="radio"], .option input[type="checkbox"] {
+  margin-top: 3px;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+.option .opt-text { font-size: 14px; flex: 1; }
+.option input[type="text"] {
+  flex: 1;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 8px;
+  font-size: 14px;
+}
+.option input[type="text"]:focus { outline: none; border-color: var(--primary); }
+
+/* ===== Submit ===== */
+.submit-section {
+  text-align: center;
+  margin-top: 24px;
+}
+.btn-submit {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  color: #fff;
+  border: none;
+  padding: 14px 48px;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  box-shadow: 0 4px 12px rgba(37,99,235,0.3);
+}
+.btn-submit:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(37,99,235,0.4); }
+.btn-submit:active { transform: translateY(0); }
+.btn-reset {
+  background: #fff;
+  color: var(--text-light);
+  border: 1px solid var(--border);
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  margin-left: 12px;
+}
+.btn-reset:hover { background: var(--bg); }
+
+/* ===== Results Modal ===== */
+.results-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 1000;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 20px;
+  overflow-y: auto;
+}
+.results-overlay.active { display: flex; }
+.results-modal {
+  background: #fff;
+  border-radius: var(--radius);
+  max-width: 800px;
+  width: 100%;
+  margin: auto;
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+}
+.results-header {
+  background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 100%);
+  color: #fff;
+  padding: 20px 24px;
+}
+.results-header h2 { font-size: 18px; }
+.results-header .subtitle { font-size: 13px; opacity: 0.85; margin-top: 2px; }
+.results-body { padding: 20px 24px; max-height: 70vh; overflow-y: auto; }
+.results-footer {
+  padding: 12px 24px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  background: var(--bg);
+}
+.results-footer button {
+  padding: 8px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: #fff;
+  color: var(--text);
+}
+.results-footer button.btn-primary {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+.results-footer button:hover { opacity: 0.9; }
+
+/* Results content */
+.patient-summary {
+  background: var(--bg);
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  font-size: 13px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 8px;
+}
+.patient-summary .item { display: flex; gap: 4px; }
+.patient-summary .item-label { color: var(--text-light); font-weight: 600; }
+.dx-section { margin-bottom: 20px; }
+.dx-section h3 {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  border-bottom: 2px solid var(--border);
+}
+.dx-card {
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 10px;
+  border: 1px solid var(--border);
+  transition: box-shadow 0.2s;
+}
+.dx-card:hover { box-shadow: var(--shadow); }
+.dx-card.high { border-left: 4px solid var(--danger); background: var(--danger-light); }
+.dx-card.medium { border-left: 4px solid var(--warning); background: var(--warning-light); }
+.dx-card.low { border-left: 4px solid var(--success); background: var(--success-light); }
+.dx-card .dx-name { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+.dx-card .dx-score { font-size: 12px; color: var(--text-light); margin-bottom: 6px; }
+.dx-card .dx-desc { font-size: 13px; color: var(--text); margin-bottom: 8px; line-height: 1.5; }
+.dx-card .dx-tests { font-size: 13px; }
+.dx-card .dx-tests .test-label { font-weight: 600; color: var(--primary-dark); margin-bottom: 4px; }
+.dx-card .dx-tests .test-list { display: flex; flex-wrap: wrap; gap: 4px; }
+.dx-card .dx-tests .test-tag {
+  background: var(--primary-light);
+  color: var(--primary-dark);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+.test-summary {
+  background: var(--bg);
+  border-radius: 8px;
+  padding: 14px 16px;
+  margin-top: 8px;
+}
+.test-summary h3 { font-size: 15px; margin-bottom: 8px; }
+.test-summary .all-tests { display: flex; flex-wrap: wrap; gap: 5px; }
+.test-summary .all-tests .test-tag {
+  background: #fff;
+  border: 1px solid var(--border);
+  padding: 3px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  color: var(--text);
+}
+.disclaimer {
+  font-size: 12px;
+  color: var(--text-light);
+  margin-top: 16px;
+  padding: 10px 12px;
+  background: var(--warning-light);
+  border-radius: 8px;
+  border: 1px solid #fde68a;
+  line-height: 1.5;
+}
+.contact {
+  margin-top: 8px;
+  padding: 10px 12px;
+  background: var(--primary-light);
+  border-radius: 8px;
+  border: 1px solid #93c5fd;
+  font-size: 13px;
+  color: var(--primary-dark);
+  text-align: center;
+  line-height: 1.6;
+}
+.contact .label { color: var(--text-light); margin-right: 4px; }
+.contact .value { font-weight: 600; letter-spacing: 0.5px; }
+.no-results {
+  text-align: center;
+  padding: 30px;
+  color: var(--text-light);
+}
+/* Print */
+@media print {
+  .header, .submit-section, .results-footer, .results-overlay { position: static !important; }
+  .results-overlay { background: #fff !important; display: block !important; padding: 0 !important; }
+  .results-modal { box-shadow: none !important; max-width: 100% !important; }
+  .results-body { max-height: none !important; overflow: visible !important; }
+  body { background: #fff !important; }
+  .container { display: none; }
+  .header { display: none; }
+}
+/* ===== Submit Status ===== */
+.submit-status {
+  padding: 12px 20px;
+  font-size: 14px;
+  text-align: center;
+  border-top: 1px solid var(--border);
+  display: none;
+}
+.submit-status.success { background: var(--success-light); color: var(--success); }
+.submit-status.error { background: var(--danger-light); color: var(--danger); }
+.submit-status.loading { background: var(--primary-light); color: var(--primary); }
+
+/* Footer buttons */
+.results-footer .btn-copy { color: var(--primary); border-color: var(--primary); }
+.results-footer .btn-share { color: var(--accent); border-color: var(--accent); }
+
+/* Auto-save indicator */
+.auto-save-indicator {
+  position: fixed;
+  bottom: 12px;
+  right: 12px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 12px;
+  color: var(--text-light);
+  box-shadow: var(--shadow);
+  z-index: 200;
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+.auto-save-indicator.show { opacity: 1; }
+
+/* Responsive */
+@media (max-width: 600px) {
+  .patient-info-grid { grid-template-columns: 1fr; }
+  .dim-header .dim-meta { display: none; }
+  .results-footer { flex-wrap: wrap; justify-content: center; gap: 6px; }
+  .results-footer button { font-size: 13px; padding: 8px 14px; }
+  .btn-submit { padding: 12px 32px; font-size: 15px; }
+  .container { padding: 12px 10px 80px; }
+  .dim-body { padding: 12px 14px; }
+  .option { padding: 10px 12px; }
+  .option .opt-text { font-size: 14px; }
+  .q-label { font-size: 14px; }
+  .results-body { padding: 14px 16px; }
+  .patient-summary { grid-template-columns: 1fr 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <h1>代谢健康问诊问卷</h1>
+  <div class="subtitle">林超医生诊所 · 内分泌代谢 / 低碳医学 / 功能医学 · 初诊评估</div>
+  <div class="progress-bar-wrap"><div class="progress-bar" id="progressBar"></div></div>
+  <div class="progress-text" id="progressText">已回答 0 / 0 题</div>
+</div>
+
+<!-- Main Container -->
+<div class="container" id="mainContainer">
+
+  <!-- Patient Info -->
+  <div class="patient-info-card">
+    <h2>基本信息</h2>
+    <div class="patient-info-grid">
+      <div class="field"><label>姓名</label><input type="text" id="pName" placeholder="请输入"></div>
+      <div class="field"><label>性别</label><select id="pGender"><option value="">请选择</option><option value="男">男</option><option value="女">女</option></select></div>
+      <div class="field"><label>年龄</label><input type="number" id="pAge" placeholder="岁"></div>
+      <div class="field"><label>身高(cm)</label><input type="number" id="pHeight" placeholder="cm"></div>
+      <div class="field"><label>体重(kg)</label><input type="number" id="pWeight" placeholder="kg"></div>
+      <div class="field"><label>腰围(cm)</label><input type="number" id="pWaist" placeholder="cm"></div>
+      <div class="field"><label>血压</label><input type="text" id="pBP" placeholder="如 120/80"></div>
+      <div class="field"><label>填写日期</label><input type="date" id="pDate"></div>
+      <div class="field"><label>主诉/就诊原因</label><input type="text" id="pChief" placeholder="简要描述"></div>
+    </div>
+  </div>
+
+  <!-- Questions will be rendered here -->
+  <div id="questionsContainer"></div>
+
+  <!-- Submit -->
+  <div class="submit-section">
+    <button class="btn-submit" id="btnSubmit" onclick="generateReport()">生成诊断报告</button>
+    <button class="btn-reset" onclick="resetForm()">重置</button>
+  </div>
+</div>
+
+<!-- Results Overlay -->
+<div class="results-overlay" id="resultsOverlay">
+  <div class="results-modal">
+    <div class="results-header">
+      <h2>代谢健康问诊报告</h2>
+      <div class="subtitle" id="reportSubtitle">诊断方向分析与检测推荐</div>
+    </div>
+    <div class="results-body" id="resultsBody"></div>
+    <div class="submit-status" id="submitStatus"></div>
+    <div class="results-footer">
+      <button onclick="window.print()">打印</button>
+      <button class="btn-copy" onclick="copyTextReport()">复制报告</button>
+      <button class="btn-share" onclick="shareReport()">分享给医生</button>
+      <button class="btn-primary" onclick="submitToDoctor()">提交给医生</button>
+      <button onclick="closeResults()">关闭</button>
+    </div>
+  </div>
+</div>
+
+<div class="auto-save-indicator" id="autoSaveIndicator">已自动保存</div>
+
+<script>
+// ===================== Diagnostic Directions =====================
+const DX_DATA = {
+  IR: { name: '胰岛素抵抗 / 代谢综合征', desc: '存在胰岛素抵抗倾向。高胰岛素血症是代谢亚健康的共同土壤，可导致脂肪肝、慢性炎症、雄激素升高、认知下降。', tests: ['空腹血糖','空腹胰岛素','HOMA-IR','HbA1c（糖化血红蛋白）','血脂全套','尿酸','肝功能（ALT/AST/GGT）','腰围/腰臀比'] },
+  THY_H: { name: '甲状腺功能减退倾向', desc: '存在甲减倾向。甲状腺激素直接影响基础代谢率、线粒体功能和体温调节。需排除桥本甲状腺炎。', tests: ['TSH','FT3','FT4','rT3（反向T3）','TPOAb（抗甲状腺过氧化物酶抗体）','TgAb','甲状腺B超','硒/锌/铁'] },
+  THY_Hi: { name: '甲状腺功能亢进倾向', desc: '存在甲亢倾向。需排除Graves病。甲亢可模拟焦虑、导致心悸、体重下降和骨量流失。', tests: ['TSH','FT3','FT4','TRAb','TPOAb','TgAb','甲状腺B超'] },
+  HPA: { name: 'HPA轴失调 / 肾上腺功能不全', desc: '存在皮质醇节律紊乱/肾上腺疲劳倾向。慢性应激导致HPA轴失调，影响睡眠、免疫、血糖和炎症调控。', tests: ['皮质醇四点唾液检测（晨/午/傍晚/夜）','DHEA-S','ACTH（必要时）','HRV（心率变异性）'] },
+  GUT: { name: '肠道菌群失调 / 肠漏 / 食物不耐受', desc: '存在肠道屏障功能受损/菌群失衡倾向。肠漏→LPS入血→系统性炎症；食物敏感→免疫激活→慢性炎症。', tests: ['幽门螺杆菌检测（呼气/粪便抗原）','粪便钙卫蛋白','乳糜泻抗体（tTG-IgA/DGP）','SIBO呼气试验','食物IgG/IgA检测','LPS抗体（肠漏评估）','分泌型IgA','粪便常规+潜血'] },
+  INFL: { name: '慢性系统性炎症', desc: '存在慢性低度炎症倾向。metaflammation（代谢性炎症）是胰岛素抵抗、心血管疾病、神经退行性病变和肿瘤的共同土壤。', tests: ['hs-CRP（高敏C反应蛋白）','ESR（血沉）','铁蛋白+转铁蛋白饱和度','纤维蛋白原','同型半胱氨酸','IL-6','TNF-α','Omega-3指数','AA/EPA比'] },
+  MITO: { name: '线粒体功能障碍', desc: '存在线粒体能量产生障碍倾向。线粒体是细胞的能量工厂，其功能下降导致疲劳、运动不耐受和代谢灵活性降低。', tests: ['尿有机酸检测（线粒体/Krebs循环）','辅酶Q10','L-肉碱','乳酸/丙酮酸比值','NAD+/NADH'] },
+  NUT: { name: '营养缺乏', desc: '存在微量营养素不足倾向。铁、维生素D、B12、锌、镁等缺乏可模拟多种代谢/神经/免疫症状。', tests: ['铁蛋白','维生素B12（含甲基丙二酸）','叶酸','维生素D（25-OH-D）','锌','硒','镁（RBC镁）','血常规'] },
+  AUTO: { name: '自身免疫倾向', desc: '存在自身免疫病风险。需完善自身抗体谱筛查，评估是否存在免疫耐受失调。', tests: ['ANA（抗核抗体）','抗dsDNA','ENA谱','RF（类风湿因子）','抗CCP','抗磷脂抗体','补体C3/C4','免疫球蛋白（IgG/IgA/IgM/IgE）'] },
+  HORM: { name: '性激素失衡 / PCOS倾向', desc: '存在性激素失衡/多囊卵巢综合征倾向。PCOS患者70-80%伴有胰岛素抵抗。', tests: ['性激素六项（FSH/LH/E2/P/T/PRL）','AMH','SHBG','DHEA-S','游离睾酮','空腹胰岛素+血糖'] },
+  OSA: { name: '睡眠呼吸暂停风险', desc: '存在阻塞性睡眠呼吸暂停风险。OSA是代谢综合征、高血压和认知下降的重要驱动因素。', tests: ['STOP-BANG问卷评估','多导睡眠监测（PSG）','脉氧监测'] },
+  NEURO: { name: '神经炎症 / 认知下降风险', desc: '存在神经炎症倾向。系统性炎症可通过血脑屏障引发小胶质细胞激活，导致脑雾、认知下降和情绪障碍。', tests: ['维生素B12（含甲基丙二酸）','同型半胱氨酸','血糖/HbA1c','hs-CRP/IL-6（神经炎症）','头颅MRI（必要时）','EMG/NCV（必要时）'] },
+  OXI: { name: '氧化应激', desc: '存在氧化/抗氧化失衡倾向。氧化应激是慢性炎症和组织损伤的促进因素。', tests: ['GSH/GSSG比值','MDA（丙二醛）','8-OHdG','SOD/GPx（抗氧化酶）'] },
+  INF: { name: '慢性感染', desc: '存在慢性/隐匿感染倾向。牙周病、幽门螺杆菌、EBV等可成为持续炎症源。', tests: ['EBV抗体（VCA/NA）','CMV抗体','幽门螺杆菌','HIV/肝炎筛查','牙周评估','血常规'] },
+  MOOD: { name: '情绪障碍（不排除炎症性抑郁）', desc: '存在情绪障碍倾向。慢性炎症→细胞因子→IDO→色氨酸代谢偏移→5-HT↓→抑郁（炎症性抑郁）。', tests: ['PHQ-9抑郁量表','GAD-7焦虑量表','甲状腺功能','维生素D','B12','hs-CRP/IL-6（炎症性抑郁）','Omega-3指数'] },
+  PERI: { name: '围绝经期综合征', desc: '存在围绝经期激素变化相关症状。雌激素下降影响体温调节、骨密度、情绪和心血管。', tests: ['FSH/LH/E2','骨密度（DEXA）','维生素D/钙','甲状腺功能','血脂'] },
+  PAIN: { name: '慢性疼痛 / 纤维肌痛倾向', desc: '存在慢性疼痛综合征倾向。外周炎症→中枢敏化→神经炎症→疼痛-睡眠-情绪恶性循环。', tests: ['CRP/ESR','RF/抗CCP/ANA','维生素D','尿酸','铁蛋白','骨密度'] },
+  BONE: { name: '骨健康风险', desc: '存在骨质疏松/骨量减少风险。需评估骨密度及骨代谢相关营养素和激素。', tests: ['骨密度（DEXA）','维生素D','钙/磷/镁','PTH（甲状旁腺激素）','骨转换标志物（CTX/P1NP）','性激素'] },
+};
+
+// ===================== Questions Data =====================
+const QUESTIONS = [
+  // ===== 一、体力精力与能量代谢 =====
+  { id:'d1', dim:'一、体力精力与能量代谢', icon:'⚡', questions:[
+    { id:'q1', text:'您通常在一天中哪个时间段感到最疲劳？', type:'radio', options:[
+      {t:'晨起最累，下午好转', dx:['HPA']},
+      {t:'午后最累（13-15点），餐后明显犯困', dx:['IR']},
+      {t:'傍晚/夜间反而精力变好（"第二呼吸"）', dx:['HPA']},
+      {t:'全天都累，无明显波动', dx:['MITO','THY_H','NUT','INFL']},
+      {t:'无明显疲劳', dx:[]},
+    ]},
+    { id:'q2', text:'休息/睡眠后能否恢复精力？运动后疲劳恢复速度？', type:'radio', options:[
+      {t:'休息后可恢复，运动后恢复正常', dx:[]},
+      {t:'休息后部分恢复，运动后恢复变慢', dx:['MITO','NUT']},
+      {t:'运动后疲劳显著加重且恢复很慢', dx:['MITO','THY_H']},
+      {t:'即使休息也一直累，运动不耐受', dx:['MITO','HPA','INFL']},
+    ]},
+    { id:'q3', text:'日常活动耐量（爬楼、快走）比一年前有变化吗？', type:'radio', options:[
+      {t:'没有变化', dx:[]},
+      {t:'略有下降', dx:['NUT','MITO']},
+      {t:'明显下降，爬一层楼就喘', dx:['MITO','THY_H','INFL']},
+    ]},
+    { id:'q4', text:'是否依赖咖啡因/功能饮料才能维持精力？', type:'radio', options:[
+      {t:'不依赖', dx:[]},
+      {t:'每天1-2杯咖啡/茶', dx:[]},
+      {t:'每天3杯以上，不喝就不行', dx:['HPA','MITO']},
+    ]},
+    { id:'q5', text:'基础体温（晨起口温/腋温）是否长期偏低（<36.3°C）？', type:'radio', options:[
+      {t:'不知道/没量过', dx:[]},
+      {t:'正常（≥36.3°C）', dx:[]},
+      {t:'偏低（<36.3°C），怕冷', dx:['THY_H','MITO']},
+    ]},
+    { id:'q6', text:'长时间不进食（>4小时）是否会出现头晕/心悸/手抖/焦虑？', type:'radio', options:[
+      {t:'不会', dx:[]},
+      {t:'偶尔', dx:['IR']},
+      {t:'经常出现，需要马上吃东西', dx:['IR','HPA']},
+    ]},
+    { id:'q7', text:'同样的饮食和运动习惯，体重/体脂是否在变化？', type:'radio', options:[
+      {t:'稳定', dx:[]},
+      {t:'逐渐增加，越来越难减', dx:['IR','THY_H']},
+      {t:'不明原因下降', dx:['THY_Hi','INFL','INF']},
+    ]},
+  ]},
+
+  // ===== 二、脑力 =====
+  { id:'d2', dim:'二、脑力', icon:'🧠', questions:[
+    { id:'q8', text:'是否有记忆力减退（特别是短期记忆）？', type:'radio', options:[
+      {t:'没有', dx:[]},
+      {t:'偶尔忘事，不影响生活', dx:['NUT']},
+      {t:'经常忘事，影响日常', dx:['NEURO','THY_H','NUT']},
+    ]},
+    { id:'q9', text:'是否有"脑雾"感——思维迟钝、头脑不清晰？', type:'radio', options:[
+      {t:'没有', dx:[]},
+      {t:'偶尔，与睡眠不足有关', dx:[]},
+      {t:'经常，餐后加重', dx:['IR','GUT','NEURO']},
+      {t:'持续存在，影响工作', dx:['NEURO','INFL','GUT']},
+    ]},
+    { id:'q10', text:'注意力/专注力是否下降？阅读时是否需要反复看同一段？', type:'radio', options:[
+      {t:'没有', dx:[]},
+      {t:'有时', dx:['NUT']},
+      {t:'经常', dx:['NEURO','IR']},
+    ]},
+    { id:'q11', text:'脑力症状与进食有关吗？（餐后加重）', type:'radio', options:[
+      {t:'无关/没有脑力问题', dx:[]},
+      {t:'餐后明显加重', dx:['IR','GUT']},
+    ]},
+  ]},
+
+  // ===== 三、情绪 =====
+  { id:'d3', dim:'三、情绪', icon:'😌', questions:[
+    { id:'q12', text:'近2周是否经常情绪低落/抑郁/兴趣下降？', type:'radio', options:[
+      {t:'没有', dx:[]},
+      {t:'有时低落', dx:['MOOD']},
+      {t:'经常低落，影响生活', dx:['MOOD','THY_H','INFL']},
+    ]},
+    { id:'q13', text:'是否经常焦虑/紧张/容易惊恐？', type:'radio', options:[
+      {t:'没有', dx:[]},
+      {t:'有时', dx:['MOOD']},
+      {t:'经常，有惊恐发作', dx:['MOOD','THY_Hi','HPA']},
+    ]},
+    { id:'q14', text:'饿的时候是否特别容易发怒/暴躁（"hangry"现象）？', type:'radio', options:[
+      {t:'不会', dx:[]},
+      {t:'会，吃了东西就好', dx:['IR','HPA']},
+    ]},
+    { id:'q15', text:'情绪是否有季节性变化（冬季加重）？', type:'radio', options:[
+      {t:'没有', dx:[]},
+      {t:'冬季明显加重', dx:['MOOD','NUT']},
+    ]},
+    { id:'q16', text:'（女性）情绪与月经周期关系密切吗？经前明显恶化？', type:'radio', options:[
+      {t:'无关/男性', dx:[]},
+      {t:'经前一周明显恶化', dx:['HORM','MOOD']},
+    ]},
+  ]},
+
+  // ===== 四、压力 =====
+  { id:'d4', dim:'四、压力（HPA轴）', icon:'😰', questions:[
+    { id:'q17', text:'当前主要压力源有哪些？', type:'checkbox', options:[
+      {t:'工作压力', dx:['HPA']},
+      {t:'家庭/关系', dx:['HPA']},
+      {t:'经济压力', dx:['HPA']},
+      {t:'健康焦虑', dx:['HPA']},
+      {t:'无明显压力', dx:[]},
+    ]},
+    { id:'q18', text:'是否感觉"一直在高压状态"，难以放松/切换关闭？', type:'radio', options:[
+      {t:'可以放松', dx:[]},
+      {t:'有时难以放松', dx:['HPA']},
+      {t:'一直处于紧张状态，夜间反复想事', dx:['HPA','MOOD']},
+    ]},
+    { id:'q19', text:'是否有"耗竭感"（burnout）——情感耗竭、对什么都提不起兴趣？', type:'radio', options:[
+      {t:'没有', dx:[]},
+      {t:'有时', dx:['HPA','MOOD']},
+      {t:'是，感觉被掏空了', dx:['HPA','MOOD','MITO']},
+    ]},
+    { id:'q20', text:'童年是否有不良经历（虐待/忽视/家庭功能障碍）？', type:'radio', options:[
+      {t:'没有/不愿回答', dx:[]},
+      {t:'有', dx:['HPA','MOOD','INFL']},
+    ]},
+  ]},
+
+  // ===== 五、睡眠 =====
+  { id:'d5', dim:'五、睡眠质量', icon:'😴', questions:[
+    { id:'q21', text:'入睡需要多长时间？', type:'radio', options:[
+      {t:'<15分钟', dx:[]},
+      {t:'15-30分钟', dx:[]},
+      {t:'>30分钟（入睡困难）', dx:['HPA','MOOD']},
+    ]},
+    { id:'q22', text:'夜间醒来几次？醒来后能否再入睡？', type:'radio', options:[
+      {t:'不醒/醒后能立即入睡', dx:[]},
+      {t:'1-2次，能再入睡', dx:[]},
+      {t:'3次以上，或醒后难以再入睡', dx:['HPA','IR','OSA']},
+    ]},
+    { id:'q23', text:'凌晨几点醒后就睡不着了？', type:'radio', options:[
+      {t:'不到点不醒', dx:[]},
+      {t:'凌晨2-4点早醒', dx:['HPA','MOOD','IR']},
+      {t:'4-5点醒（天还没亮）', dx:['HPA','MOOD']},
+    ]},
+    { id:'q24', text:'是否打鼾？有无被告知呼吸暂停/憋气？', type:'radio', options:[
+      {t:'不打鼾', dx:[]},
+      {t:'打鼾但无暂停', dx:[]},
+      {t:'打鼾且有呼吸暂停/憋气', dx:['OSA','IR','INFL']},
+    ]},
+    { id:'q25', text:'白天是否嗜睡/不受控制地想睡？', type:'radio', options:[
+      {t:'不会', dx:[]},
+      {t:'有时', dx:['OSA','HPA']},
+      {t:'经常，影响工作和驾驶', dx:['OSA']},
+    ]},
+    { id:'q26', text:'入睡/醒来时腿部是否有不适感，需要活动才舒服？', type:'radio', options:[
+      {t:'没有', dx:[]},
+      {t:'有', dx:['NUT']},
+    ]},
+    { id:'q27', text:'每日总睡眠时长？', type:'radio', options:[
+      {t:'7-9小时', dx:[]},
+      {t:'5-6小时', dx:['INFL','HPA']},
+      {t:'<5小时', dx:['INFL','HPA','MOOD']},
+      {t:'>10小时（仍觉得累）', dx:['THY_H','MITO','HPA']},
+    ]},
+  ]},
+
+  // ===== 六、肌肉骨骼与慢性疼痛 =====
+  { id:'d6', dim:'六、肌肉骨骼与慢性疼痛', icon:'🦴', questions:[
+    { id:'q28', text:'是否有慢性疼痛（持续>3个月）？部位？', type:'checkbox', options:[
+      {t:'无慢性疼痛', dx:[]},
+      {t:'多关节对称疼痛', dx:['AUTO','INFL']},
+      {t:'广泛性肌肉酸痛', dx:['PAIN','NUT','INFL']},
+      {t:'头痛（偏头痛/紧张性）', dx:['NEURO','GUT']},
+      {t:'腰背痛', dx:['PAIN']},
+      {t:'纤维肌痛样压痛点', dx:['PAIN','INFL']},
+    ]},
+    { id:'q29', text:'关节晨僵持续多久？', type:'radio', options:[
+      {t:'无晨僵', dx:[]},
+      {t:'<30分钟', dx:[]},
+      {t:'>30分钟（活动后缓解）', dx:['AUTO','INFL']},
+    ]},
+    { id:'q30', text:'是否有肌肉痉挛/抽筋（特别是夜间小腿）？', type:'radio', options:[
+      {t:'没有', dx:[]},
+      {t:'偶尔', dx:['NUT']},
+      {t:'经常', dx:['NUT','THY_H']},
+    ]},
+    { id:'q31', text:'是否有过骨折？是否轻微外伤就骨折？', type:'radio', options:[
+      {t:'无骨折', dx:[]},
+      {t:'严重外伤骨折', dx:[]},
+      {t:'轻微外伤骨折（脆性骨折）', dx:['BONE']},
+    ]},
+    { id:'q32', text:'身高是否缩矮？', type:'radio', options:[
+      {t:'没有', dx:[]},
+      {t:'缩矮2cm以上', dx:['BONE']},
+    ]},
+    { id:'q33', text:'是否有不明原因的全身酸痛/乏力（非运动性）？', type:'radio', options:[
+      {t:'没有', dx:[]},
+      {t:'有', dx:['INFL','INF']},
+    ]},
+  ]},
+
+  // ===== 七、甲状腺 =====
+  { id:'d7', dim:'七、甲状腺激素平衡', icon:'🦋', questions:[
+    { id:'q34', text:'是否比同龄人更怕冷？', type:'radio', options:[
+      {t:'不怕冷', dx:[]},
+      {t:'是，明显怕冷', dx:['THY_H']},
+    ]},
+    { id:'q35', text:'是否怕热、多汗？', type:'radio', options:[
+      {t:'不怕热', dx:[]},
+      {t:'是，明显怕热多汗', dx:['THY_Hi']},
+    ]},
+    { id:'q36', text:'是否有颈部肿大/压迫感/吞咽不适？', type:'radio', options:[
+      {t:'没有', dx:[]},
+      {t:'有', dx:['THY_H','THY_Hi']},
+    ]},
+    { id:'q37', text:'是否曾被诊断甲状腺疾病？或有甲状腺疾病家族史？', type:'radio', options:[
+      {t:'没有', dx:[]},
+      {t:'有', dx:['THY_H','THY_Hi','AUTO']},
+    ]},
+    { id:'q38', text:'是否有眼球突出/眼睑后退/复视？', type:'radio', options:[
+      {t:'没有', dx:[]},
+      {t:'有', dx:['THY_Hi']},
+    ]},
+    { id:'q39', text:'声音是否变低/嘶哑？心率偏慢还是偏快？', type:'radio', options:[
+      {t:'正常', dx:[]},
+      {t:'声音低/心率慢（<60）', dx:['THY_H']},
+      {t:'心率快（>90）/心悸', dx:['THY_Hi']},
+    ]},
+  ]},
+
+  // ===== 八、胃肠道 =====
+  { id:'d8', dim:'八、胃肠道症状', icon:'🫃', questions:[
+    { id:'q40', text:'是否经常腹胀？哪些食物加重？', type:'checkbox', options:[
+      {t:'无腹胀', dx:[]},
+      {t:'餐后腹胀', dx:['GUT']},
+      {t:'面食/麸质加重', dx:['GUT']},
+      {t:'乳制品加重', dx:['GUT']},
+      {t:'豆类/洋葱/大蒜加重（FODMAP）', dx:['GUT']},
+    ]},
+    { id:'q41', text:'排便习惯如何？', type:'radio', options:[
+      {t:'每日1次，正常', dx:[]},
+      {t:'便秘为主', dx:['THY_H','GUT']},
+      {t:'腹泻为主', dx:['GUT','THY_Hi']},
+      {t:'便秘腹泻交替', dx:['GUT','INFL']},
+    ]},
+    { id:'q42', text:'大便中是否有黏液/血/未消化食物？', type:'radio', options:[
+      {t:'没有', dx:[]},
+      {t:'有黏液/未消化食物', dx:['GUT']},
+      {t:'有血', dx:['GUT','INFL']},
+    ]},
+    { id:'q43', text:'是否反酸/烧心/嗳气？', type:'radio', options:[
+      {t:'没有', dx:[]},
+      {t:'偶尔', dx:['GUT']},
+      {t:'经常，夜间反流', dx:['GUT','OSA']},
+    ]},
+    { id:'q44', text:'是否对某些食物不耐受/过敏？', type:'checkbox', options:[
+      {t:'没有', dx:[]},
+      {t:'麸质', dx:['GUT','INFL']},
+      {t:'乳制品', dx:['GUT']},
+      {t:'鸡蛋', dx:['GUT']},
+      {t:'坚果/大豆', dx:['GUT']},
+      {t:'不确定', dx:['GUT']},
+    ]},
+    { id:'q45', text:'是否使用过抗生素（近6个月内）？频率？', type:'radio', options:[
+      {t:'未使用', dx:[]},
+      {t:'1次', dx:['GUT']},
+      {t:'2次以上', dx:['GUT','INFL']},
+    ]},
+    { id:'q46', text:'是否有慢性牙龈炎/牙周病/牙齿松动？', type:'radio', options:[
+      {t:'没有', dx:[]},
+      {t:'有', dx:['INFL','INF']},
+    ]},
+  ]},
+
+  // ===== 九、饮食 =====
+  { id:'d9', dim:'九、饮食习惯', icon:'🍽️', questions:[
+    { id:'q47', text:'每日几餐？有无零食/夜宵习惯？', type:'radio', options:[
+      {t:'2-3餐，无零食', dx:[]},
+      {t:'3餐+零食', dx:['IR']},
+      {t:'频繁进食（>5次/天）', dx:['IR']},
+      {t:'有夜宵习惯', dx:['IR','HPA']},
+    ]},
+    { id:'q48', text:'主食类型与份量？', type:'radio', options:[
+      {t:'少量粗粮/杂粮为主', dx:[]},
+      {t:'精米白面为主', dx:['IR','INFL']},
+      {t:'大量精制碳水', dx:['IR','INFL']},
+      {t:'低碳/生酮饮食', dx:[]},
+    ]},
+    { id:'q49', text:'含糖饮料/果汁/甜食摄入频率？', type:'radio', options:[
+      {t:'几乎不喝', dx:[]},
+      {t:'每周几次', dx:['IR']},
+      {t:'每天', dx:['IR','INFL']},
+    ]},
+    { id:'q50', text:'食用油类型？是否经常高温煎炸？', type:'radio', options:[
+      {t:'橄榄油/牛油果油为主', dx:[]},
+      {t:'大豆油/玉米油/葵花籽油为主', dx:['INFL']},
+      {t:'经常高温煎炸', dx:['INFL','OXI']},
+    ]},
+    { id:'q51', text:'外卖/超加工食品频率？', type:'radio', options:[
+      {t:'很少', dx:[]},
+      {t:'每周几次', dx:['IR','INFL']},
+      {t:'每天', dx:['IR','INFL','GUT']},
+    ]},
+  ]},
+
+  // ===== 十、皮肤与毛发 =====
+  { id:'d10', dim:'十、皮肤与毛发', icon:'👤', questions:[
+    { id:'q52', text:'颈部/腋下/腹股沟皮肤是否发黑增厚（黑棘皮病）？', type:'radio', options:[
+      {t:'没有', dx:[]},
+      {t:'有', dx:['IR']},
+    ]},
+    { id:'q53', text:'是否有痤疮？成年后新发或加重？', type:'radio', options:[
+      {t:'没有', dx:[]},
+      {t:'青春期有，现在没有', dx:[]},
+      {t:'成年后新发或加重', dx:['IR','HORM']},
+    ]},
+    { id:'q54', text:'皮肤是否干燥/脱屑？指甲是否变脆/匙状甲？', type:'radio', options:[
+      {t:'正常', dx:[]},
+      {t:'干燥/脱屑', dx:['THY_H','NUT']},
+      {t:'匙状甲（凹陷）', dx:['NUT']},
+      {t:'指甲脆裂/纵嵴', dx:['THY_H','NUT']},
+    ]},
+    { id:'q55', text:'伤口愈合速度？是否容易淤青？', type:'radio', options:[
+      {t:'正常', dx:[]},
+      {t:'愈合慢', dx:['IR','NUT','INFL']},
+      {t:'容易淤青', dx:['NUT']},
+    ]},
+    { id:'q56', text:'是否有脱发？弥漫性还是斑片状？', type:'radio', options:[
+      {t:'无脱发', dx:[]},
+      {t:'弥漫性脱发', dx:['THY_H','NUT','HPA']},
+      {t:'前额/头顶稀疏', dx:['HORM']},
+      {t:'斑片状脱发', dx:['AUTO']},
+    ]},
+    { id:'q57', text:'外侧眉毛外1/3是否稀疏？', type:'radio', options:[
+      {t:'正常', dx:[]},
+      {t:'稀疏/脱落', dx:['THY_H']},
+    ]},
+    { id:'q58', text:'是否有蜘蛛痣/掌红斑/紫纹？', type:'checkbox', options:[
+      {t:'没有', dx:[]},
+      {t:'蜘蛛痣/掌红斑', dx:['IR','INFL']},
+      {t:'紫纹（腹部/大腿）', dx:['HPA']},
+    ]},
+  ]},
+
+  // ===== 十一、神经系统 =====
+  { id:'d11', dim:'十一、神经系统', icon:'🧩', questions:[
+    { id:'q59', text:'是否有肢体麻木/刺痛/烧灼感？分布？', type:'radio', options:[
+      {t:'没有', dx:[]},
+      {t:'手套-袜套样（双手双脚）', dx:['NEURO','IR']},
+      {t:'单侧', dx:['NEURO']},
+    ]},
+    { id:'q60', text:'是否有头晕/眩晕？与体位有关？', type:'radio', options:[
+      {t:'没有', dx:[]},
+      {t:'站起时头晕', dx:['HPA','NEURO']},
+      {t:'旋转性眩晕', dx:['NEURO']},
+    ]},
+    { id:'q61', text:'是否有震颤（手抖）？', type:'radio', options:[
+      {t:'没有', dx:[]},
+      {t:'紧张时轻微', dx:[]},
+      {t:'静止性震颤', dx:['NEURO']},
+      {t:'姿势性/动作性震颤', dx:['THY_Hi','NEURO']},
+    ]},
+    { id:'q62', text:'嗅觉/味觉有无变化？', type:'radio', options:[
+      {t:'正常', dx:[]},
+      {t:'减退', dx:['NEURO','NUT']},
+    ]},
+    { id:'q63', text:'是否有体位性头晕/出汗异常/排尿困难/性功能障碍？', type:'radio', options:[
+      {t:'没有', dx:[]},
+      {t:'有', dx:['NEURO','IR']},
+    ]},
+  ]},
+
+  // ===== 十二、女性健康 =====
+  { id:'d12', dim:'十二、女性健康（男性跳过）', icon:'♀️', questions:[
+    { id:'q64', text:'月经周期是否规律？近1年有无变化？', type:'radio', options:[
+      {t:'规律（21-35天）', dx:[]},
+      {t:'不规律/周期延长', dx:['HORM','THY_H','IR']},
+      {t:'已绝经', dx:['PERI','BONE']},
+      {t:'男性（跳过）', dx:[]},
+    ]},
+    { id:'q65', text:'是否有潮热/盗汗/阴道干涩？', type:'radio', options:[
+      {t:'没有', dx:[]},
+      {t:'有', dx:['PERI']},
+    ]},
+    { id:'q66', text:'是否有多毛/痤疮/脱发等高雄激素表现？', type:'radio', options:[
+      {t:'没有', dx:[]},
+      {t:'有', dx:['HORM','IR']},
+    ]},
+    { id:'q67', text:'是否有妊娠期糖尿病/子痫前期史？', type:'radio', options:[
+      {t:'没有', dx:[]},
+      {t:'有', dx:['IR']},
+    ]},
+    { id:'q68', text:'经前症状（PMS/PMDD）是否严重影响生活？', type:'radio', options:[
+      {t:'没有/已绝经/男性', dx:[]},
+      {t:'轻度', dx:[]},
+      {t:'重度（情绪剧烈波动/乳房胀痛/水肿）', dx:['HORM','MOOD']},
+    ]},
+  ]},
+
+  // ===== 十三、免疫与慢性炎症 =====
+  { id:'d13', dim:'十三、免疫与慢性炎症', icon:'🛡️', questions:[
+    { id:'q69', text:'每年感冒/上呼吸道感染次数？恢复速度？', type:'radio', options:[
+      {t:'1-2次/年，1周内恢复', dx:[]},
+      {t:'3-5次/年，恢复较慢', dx:['NUT','INF']},
+      {t:'>5次/年，或反复不愈', dx:['NUT','INF','INFL']},
+    ]},
+    { id:'q70', text:'是否有过敏性疾病（鼻炎/哮喘/湿疹/荨麻疹）？', type:'checkbox', options:[
+      {t:'没有', dx:[]},
+      {t:'过敏性鼻炎', dx:['GUT','INFL']},
+      {t:'哮喘', dx:['INFL']},
+      {t:'湿疹/荨麻疹', dx:['GUT','INFL']},
+    ]},
+    { id:'q71', text:'是否有自身免疫病既往诊断？或家族中有自身免疫病？', type:'radio', options:[
+      {t:'没有', dx:[]},
+      {t:'有（自己）', dx:['AUTO','INFL']},
+      {t:'有（家族）', dx:['AUTO']},
+    ]},
+    { id:'q72', text:'是否有反复口腔溃疡？频率？', type:'radio', options:[
+      {t:'没有', dx:[]},
+      {t:'偶尔', dx:['NUT']},
+      {t:'频繁（每月）', dx:['NUT','AUTO','INFL']},
+    ]},
+    { id:'q73', text:'是否有反复真菌感染（阴道/口腔/指甲）？', type:'radio', options:[
+      {t:'没有', dx:[]},
+      {t:'有', dx:['IR','INF','NUT']},
+    ]},
+    { id:'q74', text:'是否曾被诊断脂肪肝/肝功能异常/空腹血糖偏高？', type:'checkbox', options:[
+      {t:'没有', dx:[]},
+      {t:'脂肪肝', dx:['IR','INFL']},
+      {t:'肝功能异常', dx:['INFL','GUT']},
+      {t:'空腹血糖偏高/糖耐量异常', dx:['IR','INFL']},
+    ]},
+    { id:'q75', text:'炎症指标（hs-CRP/ESR/铁蛋白）是否曾升高？', type:'radio', options:[
+      {t:'未查/正常', dx:[]},
+      {t:'轻度升高', dx:['INFL']},
+      {t:'明显升高', dx:['INFL','INF','AUTO']},
+    ]},
+  ]},
+];
+
+// ===================== Render Questions =====================
+let totalQuestions = 0;
+QUESTIONS.forEach(d => totalQuestions += d.questions.length);
+
+function renderQuestions() {
+  const container = document.getElementById('questionsContainer');
+  let html = '';
+  QUESTIONS.forEach((dim, di) => {
+    const collapsed = di > 0 ? 'collapsed' : '';
+    html += `<div class="dim-section ${collapsed}" data-dim="${dim.id}">
+      <div class="dim-header" onclick="toggleDim(this)">
+        <div class="dim-title"><span class="dim-icon">${dim.icon}</span> ${dim.dim}</div>
+        <div class="dim-meta"><span class="dim-count">${dim.questions.length}题</span><span class="dim-toggle">▼</span></div>
+      </div>
+      <div class="dim-body">`;
+    dim.questions.forEach(q => {
+      html += `<div class="question" data-qid="${q.id}">
+        <div class="q-label"><span class="q-num">${q.id.replace('q','')}.</span><span class="q-text">${q.text}</span></div>
+        <div class="options">`;
+      if (q.type === 'radio') {
+        q.options.forEach((opt, oi) => {
+          html += `<label class="option" data-qid="${q.id}" data-oi="${oi}">
+            <input type="radio" name="${q.id}" value="${oi}" onchange="onAnswer('${q.id}', this)">
+            <span class="opt-text">${opt.t}</span>
+          </label>`;
+        });
+      } else if (q.type === 'checkbox') {
+        q.options.forEach((opt, oi) => {
+          html += `<label class="option" data-qid="${q.id}" data-oi="${oi}">
+            <input type="checkbox" name="${q.id}" value="${oi}" onchange="onAnswerCB('${q.id}', this)">
+            <span class="opt-text">${opt.t}</span>
+          </label>`;
+        });
+      }
+      html += `</div></div>`;
+    });
+    html += `</div></div>`;
+  });
+  container.innerHTML = html;
+}
+
+function toggleDim(header) {
+  const section = header.parentElement;
+  section.classList.toggle('collapsed');
+}
+
+// ===================== Answer Tracking =====================
+const answers = {}; // qid -> array of selected option indices
+
+// ===================== API Config =====================
+// 腾讯文档智能表格API配置（患者提交后数据自动写入）
+const TX_API = {
+  baseUrl: 'https://docs.qq.com',
+  fileID: '300000000$ZzFuOgDvgtLB',
+  sheetID: 't00i2h',
+  accessToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbHQiOiJlZDY0NTFjZGRiNjk0ZTViYjUxODk5NTQ2MTVkYWQ1MyIsInR5cCI6MSwiZXhwIjoxNzg2MDk0MzMyLjIwODUzNSwiaWF0IjoxNzgzNTAyMzMyLjIwODUzNSwic3ViIjoiZjBkYjdlYzEyNDg2NDUwNmFiNTE1ZjAxZThkNmYwODcifQ.4ccLsxOhKGRuMSfecZc07aNLMTLkbkYhB9jxN2B99L4',
+  clientId: 'ed6451cddb694e5bb5189954615dad53',
+  openId: 'f0db7ec124864506ab515f01e8d6f087',
+};
+// 后端服务器地址（部署后填写，留空则直接调用腾讯文档API）
+const API_BASE = '';
+
+function onAnswer(qid, input) {
+  const oi = parseInt(input.value);
+  answers[qid] = [oi];
+  // Visual
+  document.querySelectorAll(`.option[data-qid="${qid}"]`).forEach(el => el.classList.remove('selected'));
+  input.closest('.option').classList.add('selected');
+  updateProgress();
+}
+
+function onAnswerCB(qid, input) {
+  if (!answers[qid]) answers[qid] = [];
+  const oi = parseInt(input.value);
+  if (input.checked) {
+    if (!answers[qid].includes(oi)) answers[qid].push(oi);
+    input.closest('.option').classList.add('selected');
+  } else {
+    answers[qid] = answers[qid].filter(x => x !== oi);
+    input.closest('.option').classList.remove('selected');
+  }
+  updateProgress();
+}
+
+function updateProgress() {
+  let answered = 0;
+  QUESTIONS.forEach(dim => {
+    dim.questions.forEach(q => {
+      if (answers[q.id] && answers[q.id].length > 0) answered++;
+    });
+  });
+  const pct = Math.round(answered / totalQuestions * 100);
+  document.getElementById('progressBar').style.width = pct + '%';
+  document.getElementById('progressText').textContent = `已回答 ${answered} / ${totalQuestions} 题`;
+}
+
+// ===================== Generate Report =====================
+function generateReport() {
+  // Collect DX scores
+  const dxScores = {};
+  
+  QUESTIONS.forEach(dim => {
+    dim.questions.forEach(q => {
+      const sel = answers[q.id];
+      if (!sel || sel.length === 0) return;
+      sel.forEach(oi => {
+        const dxList = q.options[oi].dx || [];
+        dxList.forEach(dx => {
+          dxScores[dx] = (dxScores[dx] || 0) + 1;
+        });
+      });
+    });
+  });
+
+  // Add BMI/waist-based flags
+  const height = parseFloat(document.getElementById('pHeight').value);
+  const weight = parseFloat(document.getElementById('pWeight').value);
+  const waist = parseFloat(document.getElementById('pWaist').value);
+  const gender = document.getElementById('pGender').value;
+  let bmi = null;
+  if (height && weight) {
+    bmi = weight / Math.pow(height/100, 2);
+    if (bmi >= 25) {
+      dxScores['IR'] = (dxScores['IR'] || 0) + 2;
+      dxScores['INFL'] = (dxScores['INFL'] || 0) + 1;
+    }
+    if (bmi >= 28) {
+      dxScores['IR'] = (dxScores['IR'] || 0) + 1;
+    }
+  }
+  if (waist) {
+    if (gender === '男' && waist >= 90) dxScores['IR'] = (dxScores['IR'] || 0) + 2;
+    if (gender === '女' && waist >= 85) dxScores['IR'] = (dxScores['IR'] || 0) + 2;
+  }
+
+  // Sort DX by score
+  const sortedDX = Object.entries(dxScores)
+    .filter(([k,v]) => v > 0)
+    .sort((a,b) => b[1] - a[1]);
+
+  // Build report
+  const name = document.getElementById('pName').value || '未填写';
+  const age = document.getElementById('pAge').value || '未填写';
+  const gend = document.getElementById('pGender').value || '未填写';
+  const date = document.getElementById('pDate').value || new Date().toISOString().slice(0,10);
+  const chief = document.getElementById('pChief').value || '未填写';
+  const bp = document.getElementById('pBP').value || '未填写';
+
+  let html = `
+    <div class="patient-summary">
+      <div class="item"><span class="item-label">姓名:</span> ${name}</div>
+      <div class="item"><span class="item-label">性别:</span> ${gend}</div>
+      <div class="item"><span class="item-label">年龄:</span> ${age}</div>
+      ${bmi ? `<div class="item"><span class="item-label">BMI:</span> ${bmi.toFixed(1)}</div>` : ''}
+      ${waist ? `<div class="item"><span class="item-label">腰围:</span> ${waist}cm</div>` : ''}
+      <div class="item"><span class="item-label">血压:</span> ${bp}</div>
+      <div class="item"><span class="item-label">日期:</span> ${date}</div>
+      <div class="item"><span class="item-label">主诉:</span> ${chief}</div>
+    </div>
+  `;
+
+  if (sortedDX.length === 0) {
+    html += `<div class="no-results">问卷未识别出明显的阳性方向。请确认已充分填写各维度问题，或建议面诊进一步评估。</div>`;
+  } else {
+    // Diagnostic directions
+    const maxScore = sortedDX[0][1];
+    html += `<div class="dx-section"><h3>📋 诊断方向分析（按匹配度排序）</h3>`;
+    
+    sortedDX.forEach(([dxId, score]) => {
+      const dx = DX_DATA[dxId];
+      if (!dx) return;
+      let level = 'low';
+      let levelLabel = '轻度倾向';
+      if (score >= maxScore * 0.6 && score >= 3) { level = 'high'; levelLabel = '高度倾向'; }
+      else if (score >= 2) { level = 'medium'; levelLabel = '中度倾向'; }
+      
+      html += `<div class="dx-card ${level}">
+        <div class="dx-name">${dx.name}</div>
+        <div class="dx-score">匹配度: ${'★'.repeat(Math.min(score,5))}${'☆'.repeat(Math.max(0,5-score))} (${score}项阳性 · ${levelLabel})</div>
+        <div class="dx-desc">${dx.desc}</div>
+        <div class="dx-tests">
+          <div class="test-label">推荐检测：</div>
+          <div class="test-list">${dx.tests.map(t => `<span class="test-tag">${t}</span>`).join('')}</div>
+        </div>
+      </div>`;
+    });
+    html += `</div>`;
+
+    // Test summary - deduplicate
+    const allTests = new Set();
+    sortedDX.forEach(([dxId, _]) => {
+      const dx = DX_DATA[dxId];
+      if (dx) dx.tests.forEach(t => allTests.add(t));
+    });
+    html += `<div class="test-summary">
+      <h3>🔬 汇总检测清单（去重）</h3>
+      <div class="all-tests">${[...allTests].map(t => `<span class="test-tag">${t}</span>`).join('')}</div>
+    </div>`;
+  }
+
+  // Disclaimer
+  html += `<div class="disclaimer">
+    ⚠️ 本报告基于患者自填问卷自动生成，仅供临床参考，不构成最终诊断。阳性发现需结合体格检查、实验室检测和医师综合判断。请携带此报告就诊，由林超医生进一步评估。
+  </div>`;
+  html += `<div class="contact">
+    <span class="label">📞 林超医生联系方式（电话 / 微信同号）：</span><span class="value">133&nbsp;9687&nbsp;9673</span>
+  </div>`;
+
+  document.getElementById('resultsBody').innerHTML = html;
+  document.getElementById('reportSubtitle').textContent = `${name} · ${gend} · ${age}岁 · ${date}`;
+  document.getElementById('resultsOverlay').classList.add('active');
+  document.getElementById('resultsOverlay').scrollTo(0, 0);
+}
+
+function closeResults() {
+  document.getElementById('resultsOverlay').classList.remove('active');
+}
+
+function resetForm() {
+  if (!confirm('确定要清空所有回答吗？')) return;
+  Object.keys(answers).forEach(k => delete answers[k]);
+  document.querySelectorAll('.option.selected').forEach(el => el.classList.remove('selected'));
+  document.querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach(el => el.checked = false);
+  document.querySelectorAll('input[type="text"], input[type="number"]').forEach(el => el.value = '');
+  updateProgress();
+}
+
+// ===================== Collect All Data =====================
+function collectAllData() {
+  const data = {
+    submittedAt: new Date().toISOString(),
+    patient: {
+      name: document.getElementById('pName').value || '未填写',
+      gender: document.getElementById('pGender').value || '未填写',
+      age: document.getElementById('pAge').value || '未填写',
+      height: document.getElementById('pHeight').value || '',
+      weight: document.getElementById('pWeight').value || '',
+      waist: document.getElementById('pWaist').value || '',
+      bp: document.getElementById('pBP').value || '未填写',
+      date: document.getElementById('pDate').value || new Date().toISOString().slice(0,10),
+      chief: document.getElementById('pChief').value || '未填写',
+    },
+    answers: [],
+    diagnostics: [],
+    tests: [],
+  };
+  const h = parseFloat(data.patient.height);
+  const w = parseFloat(data.patient.weight);
+  if (h && w) data.patient.bmi = (w / Math.pow(h/100, 2)).toFixed(1);
+
+  QUESTIONS.forEach(dim => {
+    dim.questions.forEach(q => {
+      const sel = answers[q.id];
+      if (sel && sel.length > 0) {
+        data.answers.push({
+          dimension: dim.dim,
+          questionId: q.id,
+          question: q.text,
+          answers: sel.map(oi => q.options[oi].t),
+        });
+      }
+    });
+  });
+
+  // DX scores (same logic as generateReport)
+  const dxScores = {};
+  QUESTIONS.forEach(dim => {
+    dim.questions.forEach(q => {
+      const sel = answers[q.id];
+      if (!sel || sel.length === 0) return;
+      sel.forEach(oi => {
+        (q.options[oi].dx || []).forEach(dx => {
+          dxScores[dx] = (dxScores[dx] || 0) + 1;
+        });
+      });
+    });
+  });
+  if (data.patient.bmi) {
+    const bmi = parseFloat(data.patient.bmi);
+    if (bmi >= 25) { dxScores['IR'] = (dxScores['IR']||0)+2; dxScores['INFL']=(dxScores['INFL']||0)+1; }
+    if (bmi >= 28) { dxScores['IR'] = (dxScores['IR']||0)+1; }
+  }
+  if (data.patient.waist) {
+    const waist = parseFloat(data.patient.waist);
+    if (data.patient.gender === '男' && waist >= 90) dxScores['IR']=(dxScores['IR']||0)+2;
+    if (data.patient.gender === '女' && waist >= 85) dxScores['IR']=(dxScores['IR']||0)+2;
+  }
+
+  const sortedDX = Object.entries(dxScores).filter(([k,v])=>v>0).sort((a,b)=>b[1]-a[1]);
+  const maxScore = sortedDX.length > 0 ? sortedDX[0][1] : 0;
+  const allTests = new Set();
+
+  sortedDX.forEach(([dxId, score]) => {
+    const dx = DX_DATA[dxId];
+    if (!dx) return;
+    let level = 'low', levelLabel = '轻度倾向';
+    if (score >= maxScore * 0.6 && score >= 3) { level = 'high'; levelLabel = '高度倾向'; }
+    else if (score >= 2) { level = 'medium'; levelLabel = '中度倾向'; }
+    data.diagnostics.push({
+      code: dxId, name: dx.name, score, level, levelLabel,
+      description: dx.desc, tests: dx.tests,
+    });
+    dx.tests.forEach(t => allTests.add(t));
+  });
+  data.tests = [...allTests];
+  return data;
+}
+
+// ===================== Generate Text Report =====================
+function generateTextReport() {
+  const data = collectAllData();
+  let text = '=== 代谢健康问诊报告 ===\n';
+  text += `姓名：${data.patient.name}  性别：${data.patient.gender}  年龄：${data.patient.age}岁\n`;
+  if (data.patient.bmi) text += `BMI：${data.patient.bmi}  `;
+  if (data.patient.waist) text += `腰围：${data.patient.waist}cm  `;
+  text += `血压：${data.patient.bp}  日期：${data.patient.date}\n`;
+  text += `主诉：${data.patient.chief}\n\n`;
+
+  if (data.diagnostics.length > 0) {
+    text += '--- 诊断方向分析（按匹配度排序）---\n\n';
+    data.diagnostics.forEach((d, i) => {
+      const stars = '\u2605'.repeat(Math.min(d.score,5)) + '\u2606'.repeat(Math.max(0,5-d.score));
+      text += `${i+1}. ${stars} ${d.name}（${d.score}项阳性 \u00b7 ${d.levelLabel}）\n`;
+      text += `   ${d.description}\n`;
+      text += `   推荐检测：${d.tests.join('\u3001')}\n\n`;
+    });
+    text += '--- 汇总检测清单（去重）---\n';
+    text += data.tests.join('\u3001') + '\n\n';
+  }
+
+  text += '--- 问卷详情 ---\n\n';
+  data.answers.forEach(a => {
+    text += `\u3010${a.dimension}\u3011\n`;
+    text += `${a.questionId.replace('q','')}. ${a.question}\n`;
+    text += `\u2192 ${a.answers.join('\uff1b')}\n\n`;
+  });
+
+  text += '=== 林超医生诊所问诊系统自动生成 ===\n';
+  text += '\u26a0\ufe0f 仅供临床参考，不构成最终诊断。请携带此报告就诊。';
+  return text;
+}
+
+// ===================== Generate TSV (for spreadsheet) =====================
+function generateTSVReport() {
+  const data = collectAllData();
+  let tsv = '\u7ef4\u5ea6\t\u9898\u53f7\t\u95ee\u9898\t\u56de\u7b54\n';
+  data.answers.forEach(a => {
+    tsv += `${a.dimension}\t${a.questionId}\t${a.question}\t${a.answers.join('\uff1b')}\n`;
+  });
+  return tsv;
+}
+
+// ===================== Copy to Clipboard =====================
+function copyTextReport() {
+  const text = generateTextReport();
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(text).then(() => {
+      showSubmitStatus('\u2705 \u62a5\u544a\u5df2\u590d\u5236\u5230\u526a\u8d34\u677f\uff0c\u8bf7\u7c98\u8d34\u5230\u5fae\u4fe1\u53d1\u9001\u7ed9\u533b\u751f', 'success');
+    }).catch(() => { fallbackCopy(text); });
+  } else {
+    fallbackCopy(text);
+  }
+}
+
+function fallbackCopy(text) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.select();
+  try {
+    document.execCommand('copy');
+    showSubmitStatus('\u2705 \u62a5\u544a\u5df2\u590d\u5236\u5230\u526a\u8d34\u677f\uff0c\u8bf7\u7c98\u8d34\u5230\u5fae\u4fe1\u53d1\u9001\u7ed9\u533b\u751f', 'success');
+  } catch(e) {
+    showSubmitStatus('\u274c \u590d\u5236\u5931\u8d25\uff0c\u8bf7\u624b\u52a8\u9009\u62e9\u6587\u672c\u590d\u5236', 'error');
+  }
+  document.body.removeChild(ta);
+}
+
+// ===================== Share via Web Share API =====================
+function shareReport() {
+  const text = generateTextReport();
+  if (navigator.share) {
+    navigator.share({ title: '\u4ee3\u8c22\u5065\u5eb7\u95ee\u8bca\u62a5\u544a', text: text })
+      .then(() => showSubmitStatus('\u2705 \u5206\u4eab\u6210\u529f', 'success'))
+      .catch(e => { if (e.name !== 'AbortError') copyTextReport(); });
+  } else {
+    copyTextReport();
+  }
+}
+
+// ===================== Submit to Doctor (API) =====================
+async function submitToDoctor() {
+  const data = collectAllData();
+  
+  // 格式化诊断方向和检测项
+  const dxText = data.diagnostics
+    .map(d => d.name + '(' + d.score + '项/' + d.levelLabel + ')')
+    .join('; ');
+  const testText = data.tests.join('、');
+  const answersText = data.answers
+    .map(a => '[' + a.dimension + '] ' + a.questionId.replace('q','') + '. ' + a.question + ': ' + a.answers.join('; '))
+    .join('\n');
+  
+  // 构造腾讯文档智能表格记录
+  const record = {
+    addRecords: {
+      records: [{
+        values: {
+          '提交时间': [{ type: 'text', text: new Date(data.submittedAt).toLocaleString('zh-CN') }],
+          '姓名': [{ type: 'text', text: data.patient.name }],
+          '性别': [{ type: 'text', text: data.patient.gender }],
+          '年龄': [{ type: 'text', text: String(data.patient.age) }],
+          'BMI': [{ type: 'text', text: data.patient.bmi || '' }],
+          '腰围': [{ type: 'text', text: data.patient.waist ? data.patient.waist + 'cm' : '' }],
+          '血压': [{ type: 'text', text: data.patient.bp }],
+          '主诉': [{ type: 'text', text: data.patient.chief }],
+          '诊断方向': [{ type: 'text', text: dxText || '暂无' }],
+          '推荐检测': [{ type: 'text', text: testText || '暂无' }],
+          '问卷详情': [{ type: 'text', text: answersText || '暂无' }],
+        }
+      }]
+    }
+  };
+  
+  showSubmitStatus('正在提交...', 'loading');
+  
+  // 方式1: 通过后端服务器提交（同源或API_BASE指定的地址）
+  const serverUrl = API_BASE ? API_BASE + '/api/submit' : '/api/submit';
+  try {
+    const resp = await fetch(serverUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    if (resp.ok) {
+      const result = await resp.json();
+      if (result.success || result.docSynced) {
+        const syncMsg = result.docSynced ? '已自动同步到腾讯文档。' : '';
+        showSubmitStatus('\u2705 提交成功！医生已收到您的问卷。' + syncMsg + '提交时间：' + new Date().toLocaleString('zh-CN'), 'success');
+        return;
+      }
+    }
+  } catch(e) {
+    console.error('Server submit failed:', e);
+  }
+  
+  // 方式2: 直接调用腾讯文档API写入智能表格
+  try {
+    const apiUrl = TX_API.baseUrl + '/openapi/smartbook/v2/files/' + TX_API.fileID + '/sheets/' + TX_API.sheetID;
+    const resp = await fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        'Access-Token': TX_API.accessToken,
+        'Client-Id': TX_API.clientId,
+        'Open-Id': TX_API.openId,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(record),
+    });
+    
+    const result = await resp.json();
+    
+    if (result.ret === 0) {
+      showSubmitStatus('\u2705 提交成功！医生已收到您的问卷。提交时间：' + new Date().toLocaleString('zh-CN'), 'success');
+      return;
+    } else {
+      console.error('API error:', result);
+      throw new Error('ret=' + result.ret);
+    }
+  } catch(e) {
+    console.error('Direct API submit failed:', e);
+  }
+  
+  // 方式3: 降级为复制报告
+  copyTextReport();
+  showSubmitStatus('\u26a0\ufe0f 自动提交暂不可用，已复制报告。请粘贴到微信发送给医生。', 'error');
+}
+
+function showSubmitStatus(msg, type) {
+  const el = document.getElementById('submitStatus');
+  el.textContent = msg;
+  el.className = 'submit-status ' + type;
+  el.style.display = 'block';
+  if (type === 'success' || type === 'error') {
+    setTimeout(() => { el.style.display = 'none'; }, 6000);
+  }
+}
+
+// ===================== Auto Save (localStorage) =====================
+let autoSaveTimer = null;
+function autoSave() {
+  const data = {
+    patient: {
+      name: document.getElementById('pName').value,
+      gender: document.getElementById('pGender').value,
+      age: document.getElementById('pAge').value,
+      height: document.getElementById('pHeight').value,
+      weight: document.getElementById('pWeight').value,
+      waist: document.getElementById('pWaist').value,
+      bp: document.getElementById('pBP').value,
+      date: document.getElementById('pDate').value,
+      chief: document.getElementById('pChief').value,
+    },
+    answers: answers,
+  };
+  try { localStorage.setItem('metabolic_survey', JSON.stringify(data)); } catch(e) {}
+  const ind = document.getElementById('autoSaveIndicator');
+  if (ind) { ind.classList.add('show'); clearTimeout(autoSaveTimer); autoSaveTimer = setTimeout(()=>ind.classList.remove('show'), 1500); }
+}
+
+function autoLoad() {
+  try {
+    const saved = localStorage.getItem('metabolic_survey');
+    if (!saved) return;
+    const data = JSON.parse(saved);
+    const fieldMap = { name:'pName', gender:'pGender', age:'pAge', height:'pHeight', weight:'pWeight', waist:'pWaist', bp:'pBP', date:'pDate', chief:'pChief' };
+    if (data.patient) {
+      Object.keys(data.patient).forEach(k => {
+        const el = document.getElementById(fieldMap[k]);
+        if (el && data.patient[k]) el.value = data.patient[k];
+      });
+    }
+    if (data.answers) {
+      Object.keys(data.answers).forEach(qid => {
+        const ois = data.answers[qid];
+        if (!Array.isArray(ois)) return;
+        ois.forEach(oi => {
+          const input = document.querySelector(`input[name="${qid}"][value="${oi}"]`);
+          if (input) { input.checked = true; input.closest('.option').classList.add('selected'); }
+        });
+        answers[qid] = ois;
+      });
+      updateProgress();
+    }
+  } catch(e) {}
+}
+
+// ===================== Init =====================
+renderQuestions();
+updateProgress();
+autoLoad();
+document.getElementById('pDate').value = new Date().toISOString().slice(0,10);
+// Auto-save on input changes
+document.addEventListener('change', autoSave);
+document.addEventListener('input', autoSave);
+</script>
+</body>
+</html>
